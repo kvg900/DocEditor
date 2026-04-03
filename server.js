@@ -1,29 +1,24 @@
+import http from 'http';
 import express from 'express';
-import { createServer } from 'node:http';
 import { WebSocketServer } from 'ws';
-import yWebsocketUtils from 'y-websocket/bin/utils';
-
-const { setupWSConnection } = yWebsocketUtils;
+import { setupWSConnection } from 'y-websocket/bin/utils.js';
 
 const app = express();
 
-app.get('/', (_request, response) => {
-  response.status(200).send('ok');
+// Optional health check
+app.get('/', (_req, res) => {
+  res.send('Yjs WebSocket server is running');
 });
 
-const server = createServer(app);
-const wss = new WebSocketServer({ noServer: true });
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
 
-wss.on('connection', setupWSConnection);
-
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
-    wss.emit('connection', ws, request);
-  });
+wss.on('connection', (ws, req) => {
+  setupWSConnection(ws, req);
 });
 
-const port = Number.parseInt(process.env.PORT ?? '1234', 10);
+const port = process.env.PORT || 1234;
 
 server.listen(port, () => {
-  console.log(`y-websocket server listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });

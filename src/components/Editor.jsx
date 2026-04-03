@@ -81,7 +81,7 @@ const Editor = ({ roomName }) => {
 
     // [CHANGED] Use dynamic roomName from URL instead of hardcoded string
     const provider = new WebsocketProvider(
-      'ws://localhost:1234',          // y-websocket server URL
+      'wss://collaborative-editor-9djr.onrender.com', // y-websocket server URL
       roomName,                       // [CHANGED] Dynamic room name from URL
       ydoc
     );
