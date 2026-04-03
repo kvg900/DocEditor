@@ -1,7 +1,7 @@
 import http from 'http';
 import express from 'express';
 import { WebSocketServer } from 'ws';
-import { setupWSConnection } from 'y-websocket/bin/utils.js';
+import { setupWSConnection } from 'y-websocket/bin/utils';
 
 const app = express();
 
