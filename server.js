@@ -1,7 +1,7 @@
-import http from 'http';
-import express from 'express';
-import { WebSocketServer } from 'ws';
-import { setupWSConnection } from 'y-websocket/bin/utils';
+const express = require('express');
+const { createServer } = require('http');
+const { WebSocketServer } = require('ws');
+const { setupWSConnection } = require('y-websocket/bin/utils');
 
 const app = express();
 
@@ -10,7 +10,7 @@ app.get('/', (_req, res) => {
   res.send('Yjs WebSocket server is running');
 });
 
-const server = http.createServer(app);
+const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws, req) => {
