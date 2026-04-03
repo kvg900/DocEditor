@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "npx y-websocket"
+    "server": "npx y-websocket",
+    "start": "node server.js"
   },
   "dependencies": {
     "@tiptap/extension-collaboration": "^2.11.5",
@@ -16,8 +17,10 @@
     "@tiptap/pm": "^2.11.5",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
+    "express": "^4.21.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "ws": "^8.18.3",
     "y-indexeddb": "^9.0.12",
     "y-prosemirror": "^1.2.15",
     "y-websocket": "^2.1.0",
