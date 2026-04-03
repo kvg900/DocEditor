@@ -1,0 +1,405 @@
+/* ============================================================
+   App.css — Styles for the collaborative editor
+   ============================================================ */
+
+/* ---- Layout ---- */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ---- Header ---- */
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.app-header p {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: #8888aa;
+}
+
+/* ---- Editor Container ---- */
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Toolbar ---- */
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #b0b0cc;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Active state when a format is applied */
+.toolbar-btn.is-active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(102, 126, 234, 0.4);
+}
+
+.toolbar-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 0.25rem;
+}
+
+/* ---- TipTap Editor Content Area ---- */
+.tiptap {
+  flex: 1;
+  padding: 1.5rem;
+  min-height: 400px;
+  outline: none;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #d8d8e8;
+  caret-color: #667eea;
+}
+
+/* Placeholder text when editor is empty */
+.tiptap p.is-editor-empty:first-child::before {
+  content: 'Start typing... Your changes sync in real time ✨';
+  color: #555577;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Paragraph spacing */
+.tiptap p {
+  margin-bottom: 0.75em;
+}
+
+/* Headings */
+.tiptap h1, .tiptap h2, .tiptap h3 {
+  color: #eeeeff;
+  margin-bottom: 0.5em;
+  margin-top: 1em;
+}
+
+/* Bold */
+.tiptap strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Italic */
+.tiptap em {
+  font-style: italic;
+  color: #c8c8e8;
+}
+
+/* Underline */
+.tiptap u {
+  text-decoration-color: #667eea;
+  text-underline-offset: 3px;
+}
+
+/* ---- Collaboration Cursor Styles ---- */
+
+/* The colored cursor line shown for remote users */
+.collaboration-cursor__caret {
+  position: relative;
+  margin-left: -1px;
+  margin-right: -1px;
+  border-left: 2px solid;
+  word-break: normal;
+  pointer-events: none;
+}
+
+/* The user name label floating above the cursor */
+.collaboration-cursor__label {
+  position: absolute;
+  top: -1.5em;
+  left: -1px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px 4px 4px 0;
+  color: #fff;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1.3;
+}
+
+/* ---- Status Bar ---- */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+  color: #666688;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #44dd88;
+  box-shadow: 0 0 6px rgba(68, 221, 136, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Pulse animation for the "connected" indicator */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---- Connected Users List ---- */
+.connected-users {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.15);
+}
+
+/* ---- Scrollbar Styling ---- */
+.tiptap::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tiptap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tiptap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.tiptap::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---- [ADDED] Room Link & Copy Button ---- */
+.room-link {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: #8888aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.room-link code {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+  color: #b0b0cc;
+  font-family: 'Courier New', monospace;
+}
+
+.copy-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b0b0cc;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-link-btn:hover {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ---- [ADDED] Join Screen ---- */
+.join-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.join-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.join-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.3rem;
+}
+
+.join-subtitle {
+  text-align: center;
+  font-size: 0.88rem;
+  color: #8888aa;
+  margin-bottom: 2rem;
+}
+
+.join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.join-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.join-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #aaaac0;
+  letter-spacing: 0.3px;
+}
+
+.join-field .optional {
+  font-weight: 400;
+  color: #666688;
+  font-size: 0.75rem;
+}
+
+.join-field input {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d8d8e8;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.join-field input::placeholder {
+  color: #555577;
+}
+
+.join-field input:focus {
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.join-btn {
+  margin-top: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
+}
+
+.join-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.join-btn:active {
+  transform: translateY(0);
+}
