@@ -18,13 +18,39 @@ import './App.css';
 const generateRoomId = () =>
   Math.random().toString(36).substring(2, 10);
 
+const extractRoomId = (value) => {
+  if (!value) return null;
+
+  let candidate = value.trim();
+  if (!candidate) return null;
+
+  for (let i = 0; i < 3; i += 1) {
+    if (/^https?:\/\//i.test(candidate)) {
+      try {
+        candidate = new URL(candidate).pathname;
+      } catch {
+        break;
+      }
+    }
+
+    const docParts = candidate.split('/doc/');
+    if (docParts.length > 1) {
+      candidate = docParts[docParts.length - 1];
+    }
+
+    candidate = candidate.replace(/^\/+/, '').split(/[/?#]/)[0];
+  }
+
+  const match = candidate.match(/[a-zA-Z0-9_-]+/);
+  return match ? match[0] : null;
+};
+
 /**
  * Check if the current URL contains a room.
  * Returns the room ID if found, null otherwise.
  */
 const getRoomFromUrl = () => {
-  const match = window.location.pathname.match(/^\/doc\/([a-zA-Z0-9_-]+)/);
-  return match ? match[1] : null;
+  return extractRoomId(window.location.pathname);
 };
 
 // ---- Join Screen Component ----
@@ -37,7 +63,7 @@ function JoinScreen({ onJoin }) {
   const handleJoin = (e) => {
     e.preventDefault();
     const finalName = name.trim() || 'Anonymous';
-    const finalRoom = roomId.trim() || generateRoomId();
+    const finalRoom = extractRoomId(roomId) || generateRoomId();
 
     // Persist name
     localStorage.setItem('collab-editor-username', finalName);
@@ -108,7 +134,10 @@ function App() {
           Room: <code>{roomName}</code>
           <button
             className="copy-link-btn"
-            onClick={() => navigator.clipboard.writeText(window.location.href)}
+            onClick={() => {
+              const shareableUrl = `${window.location.origin}/doc/${encodeURIComponent(roomName)}`;
+              navigator.clipboard.writeText(shareableUrl);
+            }}
             title="Copy shareable link"
           >
             📋 Copy Link
