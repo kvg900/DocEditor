@@ -6,7 +6,7 @@ if (!rawApiBase) {
 
 export const API_BASE = rawApiBase;
 
-export const getWsUrl = (apiBase) => {
+export const getWsUrl = (apiBase, roomId, clientId) => {
   const url = new URL(apiBase);
 
   if (url.protocol === 'https:') {
@@ -15,7 +15,7 @@ export const getWsUrl = (apiBase) => {
     url.protocol = 'ws:';
   }
 
-  return url.origin;
+  return `${url.origin}?roomId=${roomId}&clientId=${clientId}`;
 };
 
 export const safeJson = async (response) => {

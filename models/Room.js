@@ -12,6 +12,16 @@ const roomSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  createdBy: {
+    type: String,
+    required: true,
+    index: true,
+  },
+  visibility: {
+    type: String,
+    enum: ['private', 'unlisted', 'public'],
+    default: 'private',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

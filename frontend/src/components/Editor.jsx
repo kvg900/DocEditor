@@ -59,7 +59,7 @@ const getUserName = () => {
 
 // ---- [CHANGED] Editor now accepts roomName prop ----
 
-const Editor = ({ roomName }) => {
+const Editor = ({ roomName, clientId }) => {
   // Track connected users from the awareness protocol
   const [users, setUsers] = useState([]);
   const [connectionState, setConnectionState] = useState('connecting');
@@ -81,7 +81,7 @@ const Editor = ({ roomName }) => {
   const { ydoc, provider, indexeddbProvider } = useMemo(() => {
     const ydoc = new Y.Doc();
 
-    const wsUrl = getWsUrl(API_BASE);
+    const wsUrl = getWsUrl(API_BASE, roomName, clientId);
 
     const provider = new WebsocketProvider(
       wsUrl,
@@ -185,8 +185,10 @@ const Editor = ({ roomName }) => {
 
       {/* Status bar showing connection state and online users */}
       <div className="status-bar">
-        <span className="status-dot" />
-        <span>Connected as <strong>{userName}</strong></span>
+        <div className="status-info">
+          <span className={`status-dot ${connectionState}`} title={connectionState} />
+          <span>Connected as <strong className="user-name-label">{userName}</strong></span>
+        </div>
 
         {/* Display avatars for all connected users */}
         <div className="connected-users">
@@ -194,7 +196,10 @@ const Editor = ({ roomName }) => {
             <div
               key={index}
               className="user-avatar"
-              style={{ backgroundColor: user.color }}
+              style={{ 
+                backgroundColor: user.color,
+                boxShadow: `0 0 10px ${user.color}44` 
+              }}
               title={user.name}
             >
               {/* Show initials (first letter of each word) */}

@@ -1,37 +1,298 @@
-/* ============================================================
-   App.css — Styles for the collaborative editor
-   ============================================================ */
+:root {
+  /* Color Palette */
+  --bg-deep: #050508;
+  --bg-surface: #0a0a12;
+  --primary: #8b5cf6; /* Violet-500 */
+  --primary-glow: rgba(139, 92, 246, 0.4);
+  --secondary: #6366f1; /* Indigo-500 */
+  --accent: #d946ef; /* Fuchsia-500 */
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-glow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Status Colors */
+  --status-private: #f43f5e;
+  --status-unlisted: #fbbf24;
+  --status-public: #10b981;
+
+  /* Typography */
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
+  color: #e2e8f0;
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 10px;
+  border: 2px solid var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Selection */
+::selection {
+  background: var(--primary-glow);
+  color: #fff;
+}
 
 /* ---- Layout ---- */
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-width: 900px;
+  margin: 0 auto;
+  padding-top: 5rem; /* Space for Navbar */
+}
+
+/* ---- Navbar ---- */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rem;
+  background: rgba(10, 10, 18, 0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.navbar-brand:hover {
+  opacity: 0.8;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #fff;
+  text-transform: lowercase;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+}
+
+.user-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.8rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 100px;
+}
+
+.user-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--status-public);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--status-public);
+  animation: pulse 2s infinite;
+}
+
+.user-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.user-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+/* ---- Layout & Main Content ---- */
+.main-content {
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
+  animation: fadeIn 0.6s ease-out;
 }
 
 /* ---- Header ---- */
 .app-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
 }
 
-.app-header h1 {
-  font-size: 2rem;
+.header-info h1 {
+  font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
+  color: #fff;
+  margin-bottom: 0.25rem;
 }
 
-.app-header p {
-  margin-top: 0.4rem;
-  font-size: 0.9rem;
-  color: #8888aa;
+.header-info p {
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.room-link-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.room-link-container code {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--primary);
+  background: var(--primary-glow);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* ---- Empty & Skeleton States ---- */
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton-item {
+  height: 3rem;
+  background: var(--glass-bg);
+  border-radius: 12px;
+  animation: pulse-bg 2s infinite ease-in-out;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: var(--glass-bg);
+  border: 1px dashed var(--glass-border);
+  border-radius: 16px;
+  color: #64748b;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* ---- Join Screen & Card ---- */
+.join-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 5rem);
+  padding: 2rem;
+}
+
+.join-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: var(--glass-glow);
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.join-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.join-logo {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.join-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1px;
+}
+
+.join-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
 }
 
 /* ---- Editor Container ---- */
@@ -551,26 +812,27 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.65rem 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: var(--glass-bg);
   color: #d8d8e8;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.88rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 0.9rem;
   text-align: left;
 }
 
 .recent-room-btn:hover {
-  background: rgba(102, 126, 234, 0.12);
-  border-color: rgba(102, 126, 234, 0.3);
-  transform: translateX(4px);
+  background: rgba(139, 92, 246, 0.08); /* primary-glow soft */
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .recent-room-name {
   font-weight: 600;
-  color: #d0d0e8;
+  color: #fff;
 }
 
 .recent-room-meta {
@@ -581,17 +843,164 @@
 }
 
 .recent-room-meta code {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-deep);
+  border: 1px solid var(--glass-border);
   border-radius: 4px;
   padding: 0.1rem 0.35rem;
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   color: #8888aa;
   font-size: 0.7rem;
 }
 
-.recent-room-date {
-  color: #666688;
-  font-size: 0.72rem;
+/* Visibility Badges */
+.visibility-badge {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.visibility-badge.private {
+  background: rgba(244, 63, 94, 0.15);
+  color: var(--status-private);
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.1);
+}
+
+.visibility-badge.unlisted {
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--status-unlisted);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+}
+
+/* ---- Visibility Selector ---- */
+.visibility-selector {
+  margin-top: 0.5rem;
+  padding: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+
+.visibility-selector label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.visibility-options {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.visibility-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.6rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.visibility-option:hover {
+  background: var(--glass-border);
+  border-color: var(--primary-glow);
+}
+
+.visibility-option input {
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.visibility-label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.visibility-option:has(input:checked) {
+  background: var(--primary-glow);
+  border-color: var(--primary);
+}
+
+.visibility-option:has(input:checked) .visibility-label {
+  color: #fff;
+  font-weight: 600;
+}
+
+.visibility-desc {
+  font-size: 0.75rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ---- Room Sections ---- */
+.room-section {
+  margin-bottom: 2.5rem;
+  animation: slideUp 0.6s ease-out backwards;
+}
+
+.room-section:nth-child(2) { animation-delay: 0.1s; }
+
+.recent-rooms-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+  border-left: 3px solid var(--primary);
+}
+
+.recent-rooms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recent-room-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.room-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ---- Header Utilities ---- */
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.home-link {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.home-link:hover {
+  background: var(--primary-glow);
+  border-color: var(--primary);
 }
 

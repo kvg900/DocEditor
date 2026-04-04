@@ -11,9 +11,50 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { nanoid } from 'nanoid';
 import Editor from './components/Editor';
 import { API_BASE, safeJson } from './utils/network';
 import './App.css';
+
+// ---- Components ----
+
+function Navbar({ username }) {
+  return (
+    <nav className="navbar">
+      <div className="navbar-content">
+        <div className="navbar-brand" onClick={() => window.location.href = '/'}>
+          <span className="brand-icon">✍️</span>
+          <span className="brand-name">InkSync</span>
+        </div>
+        
+        {username && (
+          <div className="navbar-user">
+            <div className="user-indicator">
+              <span className="user-dot" />
+              <span className="user-label">Active:</span>
+              <span className="user-name">{username}</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+// ---- Client Identity ----
+
+/**
+ * Get or generate a persistent unique ID for this browser.
+ * This ID is used for ownership/access control without accounts.
+ */
+const getClientId = () => {
+  let id = localStorage.getItem('collab-editor-client-id');
+  if (!id) {
+    id = nanoid();
+    localStorage.setItem('collab-editor-client-id', id);
+  }
+  return id;
+};
 
 // ---- URL-Based Room Routing ----
 
@@ -54,51 +95,69 @@ const getRoomFromUrl = () => {
 
 // ---- Recent Rooms Component ----
 
-function RecentRooms({ onSelectRoom }) {
+function RecentRooms({ clientId, onSelectRoom }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    let cancelled = false;
+  const loadRooms = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/rooms?clientId=${clientId}`);
+      const data = await safeJson(res);
 
-    const loadRooms = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/rooms`);
-        const data = await safeJson(res);
-
-        if (!res.ok) {
-          throw new Error((data && data.error) || 'Failed to load rooms');
-        }
-
-        if (!cancelled) {
-          setRooms(Array.isArray(data) ? data : []);
-          setError('');
-        }
-      } catch {
-        if (!cancelled) {
-          setError('Could not load recent rooms');
-          setRooms([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+      if (!res.ok) {
+        throw new Error((data && data.error) || 'Failed to load rooms');
       }
-    };
 
+      setRooms(Array.isArray(data) ? data : []);
+      setError('');
+    } catch {
+      setError('Could not load recent rooms');
+      setRooms([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (e, roomId) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this room? This cannot be undone.')) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/rooms/${roomId}?clientId=${clientId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setRooms(rooms.filter((r) => r.roomId !== roomId));
+      } else {
+        const data = await safeJson(res);
+        alert(data.error || 'Failed to delete room');
+      }
+    } catch {
+      alert('Error connecting to server');
+    }
+  };
+
+  const handleCopyLink = (e, roomId) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/doc/${roomId}`;
+    navigator.clipboard.writeText(url);
+    alert('Link copied to clipboard!');
+  };
+
+  useEffect(() => {
     loadRooms();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  }, [clientId]);
 
   if (loading) {
     return (
       <div className="recent-rooms">
         <h3 className="recent-rooms-title">Recent Rooms</h3>
-        <p className="recent-rooms-loading">Loading…</p>
+        <div className="skeleton-list">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="skeleton-item" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -112,39 +171,85 @@ function RecentRooms({ onSelectRoom }) {
     );
   }
 
-  if (rooms.length === 0) return null;
+  const myRooms = rooms.filter(r => r.createdBy === clientId);
+  const publicRooms = rooms.filter(r => r.createdBy !== clientId && r.visibility === 'public');
+
+  if (rooms.length === 0) {
+    return (
+      <div className="recent-rooms empty">
+        <div className="empty-state">
+          <span className="empty-icon">📭</span>
+          <p>No rooms found. Create one to start syncing!</p>
+        </div>
+      </div>
+    );
+  }
+
+  const renderRoomList = (list, title) => {
+    if (list.length === 0) return null;
+    return (
+      <div className="room-section">
+        <h3 className="recent-rooms-title">{title}</h3>
+        <ul className="recent-rooms-list">
+          {list.slice(0, 5).map((room) => {
+            const isOwner = room.createdBy === clientId;
+            const icon = room.visibility === 'private' ? '🔒' : room.visibility === 'unlisted' ? '🔗' : '🌍';
+            
+            return (
+              <li key={room.roomId} className="recent-room-item">
+                <button
+                  className="recent-room-btn"
+                  onClick={() => onSelectRoom(room.roomId)}
+                >
+                  <div className="recent-room-main">
+                    <span className="room-visibility-icon" title={room.visibility}>{icon}</span>
+                    <span className="recent-room-name">{room.roomName}</span>
+                  </div>
+                  <span className="recent-room-meta">
+                    <code>{room.roomId}</code>
+                  </span>
+                </button>
+                <div className="room-actions">
+                  <button 
+                    className="action-btn copy-btn" 
+                    onClick={(e) => handleCopyLink(e, room.roomId)}
+                    title="Copy Join Link"
+                  >
+                    📋
+                  </button>
+                  {isOwner && (
+                    <button
+                      className="action-btn delete-btn"
+                      onClick={(e) => handleDelete(e, room.roomId)}
+                      title="Delete room"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
 
   return (
     <div className="recent-rooms">
-      <h3 className="recent-rooms-title">Recent Rooms</h3>
-      <ul className="recent-rooms-list">
-        {rooms.slice(0, 10).map((room) => (
-          <li key={room.roomId} className="recent-room-item">
-            <button
-              className="recent-room-btn"
-              onClick={() => onSelectRoom(room.roomId)}
-            >
-              <span className="recent-room-name">{room.roomName}</span>
-              <span className="recent-room-meta">
-                <code>{room.roomId}</code>
-                <span className="recent-room-date">
-                  {new Date(room.createdAt).toLocaleDateString()}
-                </span>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {renderRoomList(myRooms, 'My Rooms')}
+      {renderRoomList(publicRooms, 'Public Rooms')}
     </div>
   );
 }
 
 // ---- Join Screen Component ----
 
-function JoinScreen({ onJoin }) {
+function JoinScreen({ clientId, onJoin }) {
   const savedName = localStorage.getItem('collab-editor-username') || '';
   const [name, setName] = useState(savedName);
   const [roomInputName, setRoomInputName] = useState('');
+  const [visibility, setVisibility] = useState('private');
   const [joinRoomId, setJoinRoomId] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
@@ -173,7 +278,11 @@ function JoinScreen({ onJoin }) {
       const res = await fetch(`${API_BASE}/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomName: trimmedName }),
+        body: JSON.stringify({ 
+          roomName: trimmedName, 
+          clientId, 
+          visibility 
+        }),
       });
       const data = await safeJson(res);
 
@@ -204,8 +313,11 @@ function JoinScreen({ onJoin }) {
   return (
     <div className="join-screen">
       <div className="join-card">
-        <h1 className="join-title">Collaborative Editor</h1>
-        <p className="join-subtitle">Real-time editing powered by TipTap & Yjs</p>
+        <div className="join-header">
+          <span className="join-logo">✍️</span>
+          <h1 className="join-title">InkSync</h1>
+          <p className="join-subtitle">Real-time collaborative editing, simplified.</p>
+        </div>
 
         {/* Your Name */}
         <div className="join-form">
@@ -235,10 +347,36 @@ function JoinScreen({ onJoin }) {
                 value={roomInputName}
                 onChange={(e) => { setRoomInputName(e.target.value); setError(''); }}
               />
-              <button type="submit" className="join-btn create-btn" disabled={creating}>
-                {creating ? '⏳' : '✨'} Create
-              </button>
             </div>
+            
+            <div className="visibility-selector">
+              <label>Room Visibility:</label>
+              <div className="visibility-options">
+                {['private', 'unlisted', 'public'].map((v) => (
+                  <label key={v} className="visibility-option">
+                    <input
+                      type="radio"
+                      name="visibility"
+                      value={v}
+                      checked={visibility === v}
+                      onChange={(e) => setVisibility(e.target.value)}
+                    />
+                    <span className="visibility-label">
+                      {v.charAt(0).toUpperCase() + v.slice(1)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className="visibility-desc">
+                {visibility === 'private' && 'Only you can see and join this room.'}
+                {visibility === 'unlisted' && 'Not in room list, but anyone with the link can join.'}
+                {visibility === 'public' && 'Anyone can see it in the room list and join.'}
+              </p>
+            </div>
+
+            <button type="submit" className="join-btn create-btn" disabled={creating}>
+              {creating ? '⏳' : '✨'} Create Room
+            </button>
           </form>
 
           {/* Divider */}
@@ -263,46 +401,145 @@ function JoinScreen({ onJoin }) {
         </div>
 
         {/* Recent Rooms */}
-        <RecentRooms onSelectRoom={navigateToRoom} />
+        <RecentRooms clientId={clientId} onSelectRoom={navigateToRoom} />
       </div>
     </div>
   );
 }
 
+// ---- Room Guard (Access Control) ----
+
+function RoomGuard({ roomName, clientId }) {
+  const [access, setAccess] = useState({ loading: true, allowed: false, reason: null });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkAccess = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/rooms/${roomName}/access?clientId=${clientId}`);
+        const data = await safeJson(res);
+
+        if (!cancelled) {
+          if (res.ok && data.allowed) {
+            setAccess({ loading: false, allowed: true, reason: null });
+          } else {
+            setAccess({ 
+              loading: false, 
+              allowed: false, 
+              reason: data.reason || 'error' 
+            });
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setAccess({ loading: false, allowed: false, reason: 'network_error' });
+        }
+      }
+    };
+
+    checkAccess();
+    return () => { cancelled = true; };
+  }, [roomName, clientId]);
+
+  if (access.loading) {
+    return (
+      <div className="guard-screen">
+        <div className="guard-card">
+          <div className="spinner" />
+          <p>Verifying room access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!access.allowed) {
+    return (
+      <div className="guard-screen">
+        <div className="guard-card error">
+          <div className="guard-icon">
+            {access.reason === 'private' ? '🔒' : '🚫'}
+          </div>
+          <h2>Access Denied</h2>
+          <p>
+            {access.reason === 'private' && 'This is a private room. Only the owner can enter.'}
+            {access.reason === 'not_found' && 'This room does not exist or has been deleted.'}
+            {access.reason === 'network_error' && 'Could not reach the server. Please check your connection.'}
+            {access.reason === 'error' && 'An unexpected error occurred while checking access.'}
+          </p>
+          <button 
+            className="join-btn" 
+            onClick={() => window.location.href = '/'}
+          >
+            🏠 Return to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <Editor roomName={roomName} clientId={clientId} />;
+}
+
 // ---- Main App ----
 
 function App() {
+  const clientId = useMemo(() => getClientId(), []);
+  const username = useMemo(() => localStorage.getItem('collab-editor-username'), []);
+
   // Check if URL already has a room
   const initialRoom = useMemo(() => getRoomFromUrl(), []);
   const [roomName, setRoomName] = useState(initialRoom);
 
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setRoomName(getRoomFromUrl());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // No room in URL → show join screen
   if (!roomName) {
-    return <JoinScreen onJoin={setRoomName} />;
+    return (
+      <>
+        <Navbar />
+        <JoinScreen clientId={clientId} onJoin={setRoomName} />
+      </>
+    );
   }
 
-  // Room exists → show editor
+  // Room exists → show guard (which then shows editor)
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Collaborative Editor</h1>
-        <p>Real-time editing powered by TipTap & Yjs — open multiple tabs to collaborate</p>
-        <p className="room-link">
-          Room: <code>{roomName}</code>
-          <button
-            className="copy-link-btn"
-            onClick={() => {
-              const shareableUrl = `${window.location.origin}/doc/${encodeURIComponent(roomName)}`;
-              navigator.clipboard.writeText(shareableUrl);
-            }}
-            title="Copy shareable link"
-          >
-            📋 Copy Link
-          </button>
-        </p>
-      </header>
+      <Navbar username={username} />
+      
+      <main className="main-content">
+        <header className="app-header">
+          <div className="header-info">
+            <h1>{roomName}</h1>
+            <p>Real-time collaborative session</p>
+          </div>
+          
+          <div className="room-link-container">
+            <code>ID: {roomName}</code>
+            <button
+              className="copy-link-btn"
+              onClick={() => {
+                const shareableUrl = `${window.location.origin}/doc/${encodeURIComponent(roomName)}`;
+                navigator.clipboard.writeText(shareableUrl);
+                alert('Room link copied!');
+              }}
+              title="Copy shareable link"
+            >
+              📋 Copy Link
+            </button>
+          </div>
+        </header>
 
-      <Editor roomName={roomName} />
+        <RoomGuard roomName={roomName} clientId={clientId} />
+      </main>
     </div>
   );
 }
