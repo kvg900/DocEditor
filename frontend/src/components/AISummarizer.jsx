@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Copy, Settings, Check, AlertCircle } from 'lucide-react';
+import { API_BASE } from '../utils/network';
 import './AISummarizer.css';
 
 // Provider configurations
@@ -60,18 +61,22 @@ const AISummarizer = ({ isOpen, onClose, editor }) => {
 
     try {
       if (provider === 'huggingface') {
-        const res = await fetch('https://api-inference.huggingface.co/models/facebook/bart-large-cnn', {
+        const res = await fetch(`${API_BASE}/api/summarize`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ inputs: text })
+          body: JSON.stringify({ 
+            text: text,
+            apiKey: apiKey 
+          })
         });
-        if (!res.ok) throw new Error('Hugging Face API error. Check your token.');
         const data = await res.json();
-        setSummary(data[0]?.summary_text || 'Unable to generate summary.');
-      } 
+        
+        if (data.error) throw new Error(data.error);
+        
+        setSummary(data[0]?.summary_text || data.summary_text || 'Unable to generate summary.');
+      }
       else if (provider === 'openai') {
         const res = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',

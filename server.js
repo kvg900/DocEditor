@@ -25,6 +25,37 @@ app.get('/', (_req, res) => {
   res.send('Yjs WebSocket server is running');
 });
 
+// Proxy for Hugging Face API to avoid CORS issues
+app.post("/api/summarize", async (req, res) => {
+  try {
+    const { text, apiKey } = req.body;
+
+    if (!text || !apiKey) {
+      return res.status(400).json({ error: "Missing text or API key" });
+    }
+
+    const response = await fetch(
+      "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          inputs: text.slice(0, 3000)
+        })
+      }
+    );
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Summarization failed" });
+  }
+});
+
 // ---- Yjs Persistence (MongoDB) ----
 const mdb = new MongodbPersistence(process.env.MONGO_URI, {
   collectionName: 'yjs-documents',
@@ -65,8 +96,8 @@ wss.on('connection', async (ws, req) => {
   const { query } = parsedUrl;
   
   let { roomId, clientId } = query;
-  if (clientId && clientId.endsWith('/')) {
-    clientId = clientId.slice(0, -1);
+  if (clientId && clientId.includes('/')) {
+    clientId = clientId.split('/')[0];
   }
 
   console.log("WS CONNECTED");
@@ -106,7 +137,7 @@ wss.on('connection', async (ws, req) => {
 
     // Success
     console.log(`✅ Connection authorized for room: "${roomId}"`);
-    setupWSConnection(ws, req);
+    setupWSConnection(ws, req, { docName: roomId });
   } catch (err) {
     console.error('🔥 WebSocket internal error:', err);
     ws.close(1011, 'Internal server error');
