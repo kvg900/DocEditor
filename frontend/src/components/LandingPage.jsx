@@ -7,6 +7,15 @@ import './LandingPage.css';
 const LandingPage = () => {
   const navigate = useNavigate();
 
+  const [joinRoomId, setJoinRoomId] = React.useState('');
+
+  const handleJoin = (e) => {
+    e.preventDefault();
+    if (joinRoomId.trim()) {
+      navigate(`/doc/${joinRoomId.trim()}`);
+    }
+  };
+
   return (
     <div className="landing-container">
       <motion.div
@@ -23,32 +32,45 @@ const LandingPage = () => {
         </div>
 
         <h1 className="landing-title">
-          Real-time collaborative <br />
-          <span className="text-gradient">writing made simple.</span>
+          Collaborative writing <br />
+          <span className="text-gradient">made simple.</span>
         </h1>
 
         <p className="landing-subtitle">
-          Experience seamless collaboration with our ultra-minimalist editor. 
-          Built for teams who value speed, privacy, and beautiful design.
+          Experience seamless real-time collaboration. 
+          Create a new notebook or join an existing one to get started.
         </p>
 
-        <div className="landing-actions">
-          <button
-            onClick={() => navigate('/create')}
-            className="primary-btn"
-          >
-            Get Started
-            <ArrowRight className="w-5 h-5 transition-transform" />
-          </button>
-          
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="secondary-btn"
-          >
-            View Saved Notebooks
-          </button>
+        <div className="landing-actions-container">
+          <div className="landing-main-action">
+            <button
+              onClick={() => navigate('/create')}
+              className="primary-btn"
+            >
+              Get Started
+              <ArrowRight className="w-5 h-5 transition-transform" />
+            </button>
+          </div>
+
+          <div className="landing-divider">
+            <span>or join existing</span>
+          </div>
+
+          <form onSubmit={handleJoin} className="join-room-form">
+            <input
+              type="text"
+              placeholder="Enter Room ID"
+              value={joinRoomId}
+              onChange={(e) => setJoinRoomId(e.target.value)}
+              className="join-input"
+            />
+            <button type="submit" className="join-btn" disabled={!joinRoomId.trim()}>
+              Join Room
+            </button>
+          </form>
         </div>
       </motion.div>
+
 
       <motion.div
         initial={{ opacity: 0, y: 40 }}

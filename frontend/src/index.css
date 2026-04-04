@@ -137,13 +137,51 @@ button, a {
 }
 
 .primary-btn {
-  box-shadow: 0 0 15px hsl(var(--accent) / 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  background-color: hsl(var(--fg-primary));
+  color: hsl(var(--bg-primary));
+  font-weight: 600;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px hsl(var(--accent) / 0.1);
 }
 
 .primary-btn:hover {
-  box-shadow: 0 0 25px hsl(var(--accent) / 0.4);
+  opacity: 0.95;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px hsl(var(--accent) / 0.2);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+.secondary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  color: hsl(var(--fg-primary));
+  font-weight: 600;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
 }
+
 
 
 

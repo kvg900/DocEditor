@@ -5,8 +5,8 @@ import { Sparkles, User, LogOut } from 'lucide-react';
 import Editor from './components/Editor';
 import LandingPage from './components/LandingPage';
 import CreateRoomPage from './components/CreateRoomPage';
-import Dashboard from './components/Dashboard';
 import { API_BASE, safeJson } from './utils/network';
+
 import './App.css';
 
 // ---- Components ----
@@ -23,7 +23,8 @@ function Navbar({ username }) {
         </Link>
         
         <div className="navbar-actions">
-          <Link to="/dashboard" className="nav-link">Dashboard</Link>
+          {/* Dashboard link removed for simplicity */}
+
           {username && (
             <div className="navbar-user">
               <div className="user-indicator">
@@ -129,7 +130,8 @@ function RoomGuard({ clientId }) {
 
 function App() {
   const clientId = useMemo(() => getClientId(), []);
-  const username = useMemo(() => localStorage.getItem('collab-editor-username') || 'Anonymous', []);
+  const username = useMemo(() => localStorage.getItem('collab-editor-username') || 'Guest', []);
+
 
   return (
     <div className="app">
@@ -145,7 +147,8 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/create" element={<CreateRoomPage clientId={clientId} />} />
-          <Route path="/dashboard" element={<Dashboard clientId={clientId} />} />
+          {/* Dashboard route removed for simplicity */}
+
           <Route path="/doc/:roomId" element={<RoomGuard clientId={clientId} />} />
         </Routes>
       </main>

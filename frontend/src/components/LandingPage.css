@@ -64,59 +64,86 @@
   }
 }
 
-.landing-actions {
+.landing-actions-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.landing-divider {
+  font-size: 0.875rem;
+  color: hsl(var(--fg-secondary));
+  opacity: 0.6;
+  position: relative;
+  width: 100%;
+  max-width: 20rem;
+  display: flex;
+  align-items: center;
   gap: 1rem;
 }
 
+.landing-divider::before,
+.landing-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--glass-border);
+}
+
+.join-room-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 24rem;
+}
+
 @media (min-width: 640px) {
-  .landing-actions {
+  .join-room-form {
     flex-direction: row;
   }
 }
 
-.primary-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  background-color: hsl(var(--fg-primary));
-  color: hsl(var(--bg-primary));
-  font-weight: 600;
-  border-radius: 9999px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.primary-btn:hover {
-  opacity: 0.9;
-  transform: scale(1.05);
-}
-
-.primary-btn:active {
-  transform: scale(0.95);
-}
-
-.secondary-btn {
-  padding: 1rem 2rem;
-  font-weight: 600;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.join-input {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
+  border-radius: 9999px;
   color: hsl(var(--fg-primary));
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
-.secondary-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+.join-input:focus {
+  border-color: hsl(var(--accent));
+  box-shadow: 0 0 0 2px hsl(var(--accent) / 0.2);
 }
+
+.join-btn {
+  padding: 0.75rem 1.5rem;
+  background: hsl(var(--fg-primary) / 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  color: hsl(var(--fg-primary));
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.join-btn:hover:not(:disabled) {
+  background: hsl(var(--fg-primary) / 0.2);
+}
+
+.join-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 
 .landing-mockup {
   margin-top: 5rem;
