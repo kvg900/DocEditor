@@ -85,7 +85,7 @@ const Editor = ({ roomName, clientId }) => {
 
     const provider = new WebsocketProvider(
       wsUrl,
-      roomName,                       // [CHANGED] Dynamic room name from URL
+      "",
       ydoc
     );
 

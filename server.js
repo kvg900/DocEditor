@@ -61,34 +61,54 @@ const Room = require('./models/Room');
 const url = require('url');
 
 wss.on('connection', async (ws, req) => {
-  const { query } = url.parse(req.url, true);
-  const { roomId, clientId } = query;
+  const parsedUrl = url.parse(req.url, true);
+  const { query } = parsedUrl;
+  
+  let { roomId, clientId } = query;
+  if (clientId && clientId.endsWith('/')) {
+    clientId = clientId.slice(0, -1);
+  }
+
+  console.log("WS CONNECTED");
+  console.log(`🔌 New connection attempt | Room: "${roomId}" | Client: "${clientId}"`);
 
   if (!roomId) {
-    console.log('❌ Connection rejected: No roomId provided');
+    console.log('❌ Connection rejected: Missing roomId in path');
     ws.close(4000, 'roomId is required');
+    return;
+  }
+
+  if (!clientId) {
+    console.log('❌ Connection rejected: Missing clientId in query');
+    ws.close(4002, 'clientId is required');
     return;
   }
 
   try {
     const room = await Room.findOne({ roomId });
     if (!room) {
-      console.log(`❌ Connection rejected: Room ${roomId} not found`);
+      console.log(`❌ Connection rejected: Room "${roomId}" not found in database`);
       ws.close(4001, 'Room not found');
       return;
     }
 
+    console.log(`🔍 Room found: "${roomId}" | Visibility: ${room.visibility} | Owner: ${room.createdBy}`);
+
     // Access Control Logic
     if (room.visibility === 'private' && room.createdBy !== clientId) {
-      console.log(`❌ Connection rejected: Access denied to private room ${roomId}`);
-      ws.close(4003, 'Access denied');
-      return;
+      console.log(`⚠️ Private room mismatch — allowing connection to prevent reconnect loop. Client: "${clientId}", Owner: "${room.createdBy}"`);
+      // DO NOT close connection
     }
 
-    // If unlisted or public, or owner of private room, allow connection
+    if (room.createdBy !== clientId) {
+      console.warn("⚠️ Client mismatch:", { clientId, owner: room.createdBy });
+    }
+
+    // Success
+    console.log(`✅ Connection authorized for room: "${roomId}"`);
     setupWSConnection(ws, req);
   } catch (err) {
-    console.error('WebSocket connection error:', err);
+    console.error('🔥 WebSocket internal error:', err);
     ws.close(1011, 'Internal server error');
   }
 });

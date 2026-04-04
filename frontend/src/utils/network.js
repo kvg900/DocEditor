@@ -7,15 +7,11 @@ if (!rawApiBase) {
 export const API_BASE = rawApiBase;
 
 export const getWsUrl = (apiBase, roomId, clientId) => {
-  const url = new URL(apiBase);
-
-  if (url.protocol === 'https:') {
-    url.protocol = 'wss:';
-  } else if (url.protocol === 'http:') {
-    url.protocol = 'ws:';
-  }
-
-  return `${url.origin}?roomId=${roomId}&clientId=${clientId}`;
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const urlParams = new URL(apiBase);
+  const wsUrl = `${wsProtocol}://${urlParams.host}?roomId=${roomId}&clientId=${clientId}`;
+  console.log("FINAL WS URL:", wsUrl);
+  return wsUrl;
 };
 
 export const safeJson = async (response) => {
