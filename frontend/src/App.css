@@ -403,3 +403,195 @@
 .join-btn:active {
   transform: translateY(0);
 }
+
+/* ---- [ADDED] Updated Join Screen Layout ---- */
+
+.join-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.join-section-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #aaaac0;
+  letter-spacing: 0.3px;
+}
+
+.join-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.join-row input {
+  flex: 1;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d8d8e8;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.join-row input::placeholder {
+  color: #555577;
+}
+
+.join-row input:focus {
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.create-btn {
+  padding: 0.7rem 1.2rem;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.join-existing-btn {
+  padding: 0.7rem 1.2rem;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  background: linear-gradient(135deg, #4ECDC4, #45B7D1);
+}
+
+.join-existing-btn:hover {
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+.join-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.join-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.25rem 0;
+}
+
+.join-divider::before,
+.join-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.join-divider span {
+  font-size: 0.75rem;
+  color: #666688;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.join-error {
+  font-size: 0.82rem;
+  color: #FF6B6B;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ---- [ADDED] Recent Rooms ---- */
+
+.recent-rooms {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.recent-rooms-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8888aa;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.3px;
+}
+
+.recent-rooms-loading {
+  font-size: 0.82rem;
+  color: #666688;
+}
+
+.recent-rooms-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.recent-rooms-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.recent-rooms-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.recent-room-item {
+  animation: fadeIn 0.4s ease;
+}
+
+.recent-room-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #d8d8e8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.recent-room-btn:hover {
+  background: rgba(102, 126, 234, 0.12);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateX(4px);
+}
+
+.recent-room-name {
+  font-weight: 600;
+  color: #d0d0e8;
+}
+
+.recent-room-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+}
+
+.recent-room-meta code {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-family: 'Courier New', monospace;
+  color: #8888aa;
+  font-size: 0.7rem;
+}
+
+.recent-room-date {
+  color: #666688;
+  font-size: 0.72rem;
+}
+

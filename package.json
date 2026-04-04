@@ -1,54 +1,21 @@
 {
-  "name": "collaborative-editor",
+  "name": "collaborative-editor-backend",
   "private": true,
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "server": "npx y-websocket",
     "start": "node server.js"
   },
   "dependencies": {
-    "@tiptap/extension-collaboration": "^2.11.5",
-    "@tiptap/extension-collaboration-cursor": "^2.11.5",
-    "@tiptap/extension-underline": "^2.11.5",
-    "@tiptap/pm": "^2.11.5",
-    "@tiptap/react": "^2.11.5",
-    "@tiptap/starter-kit": "^2.11.5",
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
     "express": "^4.21.2",
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
     "nanoid": "^3.3.11",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "ws": "^8.18.3",
-    "y-indexeddb": "^9.0.12",
     "y-mongodb-provider": "^0.2.1",
-    "y-prosemirror": "^1.2.15",
     "y-websocket": "^2.1.0",
     "yjs": "^13.6.22"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^6.0.5"
-  },
-  "main": "db.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PK007788/collaborative-editor.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/PK007788/collaborative-editor/issues"
-  },
-  "homepage": "https://github.com/PK007788/collaborative-editor#readme",
-  "description": ""
+  }
 }
