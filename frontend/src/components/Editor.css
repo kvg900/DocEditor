@@ -381,3 +381,47 @@
     right: 1rem;
   }
 }
+
+/* ---- Print Styles for PDF Export ---- */
+@media print {
+  body {
+    background: white !important;
+  }
+  
+  /* Hide all UI elements */
+  .navbar, 
+  .toolbar-container, 
+  .status-pill, 
+  .users-popover, 
+  .loading-overlay {
+    display: none !important;
+  }
+  
+  /* Reset editor layout for print */
+  .editor-layout {
+    padding: 0 !important;
+    background: white !important;
+    min-height: 0 !important;
+  }
+  
+  /* Remove box shadow and borders from paper */
+  .editor-paper {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+  
+  /* Force text color to black for printers, regardless of dark mode */
+  [data-theme='dark'] .editor-paper, 
+  [data-theme='dark'] .tiptap {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure headings are black */
+  .tiptap h1, .tiptap h2, .tiptap h3 {
+    color: black !important;
+  }
+}

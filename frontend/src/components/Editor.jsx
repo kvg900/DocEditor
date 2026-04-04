@@ -8,6 +8,7 @@ import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import Toolbar from './Toolbar';
+import AISummarizer from './AISummarizer';
 import { API_BASE, getWsUrl } from '../utils/network';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap } from 'lucide-react';
@@ -31,9 +32,9 @@ const getUserName = () => {
 
 const Editor = ({ roomName, clientId }) => {
   const [users, setUsers] = useState([]);
-  const [connectionState, setConnectionState] = useState('connecting');
   const [synced, setSynced] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
+  const [showSummarizer, setShowSummarizer] = useState(false);
 
   const userName = useMemo(() => getUserName(), []);
   const userColor = useMemo(() => getRandomItem(COLORS), []);
@@ -50,6 +51,23 @@ const Editor = ({ roomName, clientId }) => {
 
     return { ydoc, provider, indexeddbProvider };
   }, [roomName, clientId]);
+
+  useEffect(() => {
+    // Save to local history
+    try {
+      const historyStr = localStorage.getItem('inksynk-history');
+      let history = historyStr ? JSON.parse(historyStr) : [];
+      history = history.filter(h => h.roomId !== roomName);
+      history.push({
+        roomId: roomName,
+        lastVisited: Date.now()
+      });
+      if (history.length > 20) history = history.slice(history.length - 20);
+      localStorage.setItem('inksynk-history', JSON.stringify(history));
+    } catch (e) {
+      console.error('Failed to save history', e);
+    }
+  }, [roomName]);
 
   useEffect(() => {
     const awareness = provider.awareness;
@@ -114,7 +132,11 @@ const Editor = ({ roomName, clientId }) => {
 
       {/* Editor Layout */}
       <div className="editor-layout">
-        <Toolbar editor={editor} roomName={roomName} />
+        <Toolbar 
+          editor={editor} 
+          roomName={roomName} 
+          onToggleAI={() => setShowSummarizer(true)} 
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -191,6 +213,13 @@ const Editor = ({ roomName, clientId }) => {
           </div>
         </button>
       </div>
+
+      {/* Slide-out AI Summarizer panel */}
+      <AISummarizer 
+        isOpen={showSummarizer} 
+        onClose={() => setShowSummarizer(false)} 
+        editor={editor} 
+      />
     </>
   );
 };

@@ -5,6 +5,8 @@ import { Sun, Moon, Zap, User } from 'lucide-react';
 import Editor from './components/Editor';
 import LandingPage from './components/LandingPage';
 import CreateRoomPage from './components/CreateRoomPage';
+import ExplorePage from './components/ExplorePage';
+import HistoryPage from './components/HistoryPage';
 import { API_BASE, safeJson } from './utils/network';
 
 import './App.css';
@@ -44,6 +46,9 @@ function Navbar({ theme, toggleTheme }) {
         </Link>
 
         <div className="navbar-actions">
+          <Link to="/explore" className="navbar-link">Explore</Link>
+          <Link to="/history" className="navbar-link">My Notebooks</Link>
+
           {username && (
             <div className="navbar-user" id="navbar-user-display">
               <User className="user-icon" />
@@ -170,6 +175,8 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/history" element={<HistoryPage />} />
           <Route path="/create" element={<CreateRoomPage clientId={clientId} />} />
           <Route path="/doc/:roomId" element={<RoomGuard clientId={clientId} />} />
         </Routes>

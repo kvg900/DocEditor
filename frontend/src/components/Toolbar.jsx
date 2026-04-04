@@ -10,13 +10,18 @@ import {
   Check,
   ChevronLeft,
   Zap,
+  Download,
+  FileText,
+  FileCode,
+  Sparkles,
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Toolbar.css';
 
-const Toolbar = ({ editor, roomName }) => {
+const Toolbar = ({ editor, roomName, onToggleAI }) => {
   const navigate = useNavigate();
   const [copied, setCopied] = React.useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = React.useState(false);
 
   if (!editor) return null;
 
@@ -25,6 +30,26 @@ const Toolbar = ({ editor, roomName }) => {
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadHTML = () => {
+    const html = `<div class="tiptap">${editor.getHTML()}</div>`;
+    // Basic wrapper to include styling locally if opened in browser
+    const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${roomName}</title><style>body{font-family:sans-serif;max-width:800px;margin:2rem auto;padding:1rem;} .tiptap h1{font-size:2rem} .tiptap p{line-height:1.6} .tiptap pre{background:#f3f4f6;padding:1rem;border-radius:4px;}</style></head><body>${html}</body></html>`;
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `notebook-${roomName}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowDownloadMenu(false);
+  };
+
+  const handleDownloadPDF = () => {
+    setShowDownloadMenu(false);
+    // Give state time to update and hide the menu before opening print dialog
+    setTimeout(() => window.print(), 50);
   };
 
   return (
@@ -118,6 +143,47 @@ const Toolbar = ({ editor, roomName }) => {
           >
             <List className="tb-icon" />
           </button>
+        </div>
+
+        <div className="tb-divider" />
+
+        {/* Right: AI & Download Actions */}
+        <div className="toolbar-group">
+          <button
+            className="tb ai-button"
+            onClick={onToggleAI}
+            title="AI Summarizer"
+            id="tb-ai"
+            style={{ color: 'hsl(var(--accent))' }}
+          >
+            <Sparkles className="tb-icon" />
+          </button>
+        </div>
+
+        <div className="tb-divider" />
+
+        <div className="toolbar-group relative-group">
+          <button
+            className="tb"
+            onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+            title="Download"
+            id="tb-download"
+          >
+            <Download className="tb-icon" />
+          </button>
+          
+          {showDownloadMenu && (
+            <div className="toolbar-dropdown">
+              <button className="toolbar-dropdown-item" onClick={handleDownloadPDF}>
+                <FileText className="dropdown-icon" />
+                Save as PDF
+              </button>
+              <button className="toolbar-dropdown-item" onClick={handleDownloadHTML}>
+                <FileCode className="dropdown-icon" />
+                Export HTML
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

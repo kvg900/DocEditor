@@ -1,0 +1,50 @@
+.history-page {
+  padding: 8rem 2rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.history-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.history-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: hsl(var(--fg-primary));
+}
+
+.history-subtitle {
+  font-size: 1.1rem;
+  color: hsl(var(--fg-secondary));
+  margin-bottom: 1.5rem;
+}
+
+.clear-history-btn {
+  background: transparent;
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--fg-secondary));
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-history-btn:hover {
+  background: hsl(var(--bg-secondary));
+  color: #ef4444; 
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.empty-action-btn {
+  display: inline-flex;
+  margin-top: 1.5rem;
+  text-decoration: none;
+}
+
+/* Reusing grid & card styles from ExplorePage for visual consistency. 
+   These could ideally be refactored into a shared component later. */
