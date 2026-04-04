@@ -33,6 +33,7 @@ const Editor = ({ roomName, clientId }) => {
   const [users, setUsers] = useState([]);
   const [connectionState, setConnectionState] = useState('connecting');
   const [synced, setSynced] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
 
   const userName = useMemo(() => getUserName(), []);
   const userColor = useMemo(() => getRandomItem(COLORS), []);
@@ -124,8 +125,44 @@ const Editor = ({ roomName, clientId }) => {
           <EditorContent editor={editor} />
         </motion.div>
 
+        {/* Users Popover */}
+        <AnimatePresence>
+          {showUsers && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="users-popover"
+            >
+              <div className="users-popover-header">
+                Online now • {users.length}
+              </div>
+              <div className="users-popover-list">
+                {users.map((user, index) => (
+                  <div key={index} className="users-popover-item">
+                    <div
+                      className="avatar"
+                      style={{ backgroundColor: user.color, marginLeft: 0, zIndex: 1 }}
+                    >
+                      {user.name[0]}
+                    </div>
+                    <span className="users-popover-name">
+                      {user.name} {user.name === userName ? '(You)' : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Floating Status Pill */}
-        <div className="status-pill" id="editor-status-pill">
+        <button 
+          className="status-pill" 
+          id="editor-status-pill"
+          onClick={() => setShowUsers(!showUsers)}
+        >
           <span className={`status-dot ${connectionState}`} />
           <span className="status-text">
             {connectionState === 'connected'
@@ -152,7 +189,7 @@ const Editor = ({ roomName, clientId }) => {
               </div>
             )}
           </div>
-        </div>
+        </button>
       </div>
     </>
   );

@@ -202,6 +202,15 @@
   font-size: 0.75rem;
   font-weight: 500;
   z-index: 50;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-pill:hover, .status-pill:focus {
+  background: hsl(var(--bg-secondary));
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  outline: none;
 }
 
 .status-dot {
@@ -305,11 +314,62 @@
   white-space: nowrap;
 }
 
+/* ---- Users Popover ---- */
+.users-popover {
+  position: fixed;
+  bottom: 4rem; /* Sits above the fixed status pill */
+  right: 1.5rem;
+  background: hsl(var(--bg-primary));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  min-width: 200px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.users-popover-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--fg-tertiary));
+  padding: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid hsl(var(--border));
+  margin-bottom: 0.25rem;
+}
+
+.users-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  transition: background 0.2s ease;
+}
+
+.users-popover-item:hover {
+  background: hsl(var(--bg-secondary));
+}
+
+.users-popover-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--fg-primary));
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 640px) {
   .status-pill {
     bottom: 1rem;
     right: 1rem;
     padding: 0.375rem 0.75rem;
+  }
+  .users-popover {
+    bottom: 3.25rem;
+    right: 1rem;
   }
 }
