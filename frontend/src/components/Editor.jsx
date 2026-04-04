@@ -32,6 +32,7 @@ const getUserName = () => {
 
 const Editor = ({ roomName, clientId }) => {
   const [users, setUsers] = useState([]);
+  const [connectionState, setConnectionState] = useState('connecting');
   const [synced, setSynced] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
   const [showSummarizer, setShowSummarizer] = useState(false);
