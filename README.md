@@ -1,54 +1,116 @@
-Real-Time Collaborative Editor with AI Summarization
+# InkSynk – Real-Time Collaborative Editor
 
-This project is a real-time collaborative text editor where multiple users can work on the same document simultaneously. It is built using Yjs (CRDT), TipTap, and WebSockets to handle synchronization between users.
+Live Demo: https://your-app-link.vercel.app
 
-Alongside real-time editing, the editor includes a basic AI summarization feature that can generate a summary of the document content.
+InkSynk is a full-stack real-time collaborative writing platform designed to explore how shared state systems work in multi-user environments. It allows multiple users to edit the same document simultaneously while maintaining consistency across all clients using CRDTs (Conflict-free Replicated Data Types).
 
-Features
-Real-time collaborative editing across multiple users
-Shared document state using Yjs (CRDT)
-Room-based sessions for collaboration
-WebSocket-based communication
-AI-based text summarization
-Rich text editing using TipTap
-Tech Stack
-Frontend: React, TipTap
-Backend: Node.js, WebSockets
-Synchronization: Yjs (CRDT)
-AI: API-based summarization (Hugging Face or similar)
-How it works
+The editor is built using Yjs for synchronization, TipTap for rich text editing, and WebSockets for real-time communication. In addition to collaboration, the platform includes document management features and an AI-powered summarization tool to enhance usability.
 
-Each document is associated with a room ID. Users joining the same room share a common Yjs document.
+---
 
-Changes made by any user are propagated through the WebSocket server and merged using CRDT, ensuring that all users see a consistent state without conflicts.
+## Overview
 
-The summarization feature takes the current document content and returns a condensed version using an external AI API.
+The goal of this project was to understand how real-time collaboration systems function beyond basic socket communication. Instead of relying on simple broadcast updates, the system uses Yjs to handle conflict resolution and merging of edits across multiple users without data loss.
 
-Running locally
-Start the backend server
-Start the frontend
-Open the same URL in two tabs:
-http://localhost:5173/doc/test123
+The project also explores how AI features can be layered on top of interactive systems, rather than being used in isolation.
 
-Editing in one tab should reflect in the other in real time.
+---
 
-Limitations
-No persistent storage (documents reset when server restarts)
-Cursor/presence handling is not fully stable
-Basic error handling
-What I learned
+## Key Features
 
-This project was mainly an exploration of real-time systems and shared state management.
-I worked with CRDTs (Yjs), WebSockets, and handled issues related to synchronization and multi-user editing.
+### Real-Time Collaboration
+- Multiple users can edit the same document simultaneously
+- Changes are reflected instantly across all connected clients
+- Built using Yjs (CRDT) to ensure conflict-free updates
 
-It also gave me a chance to experiment with integrating an AI feature into an interactive system.
+### Room-Based System
+- Each document is associated with a unique room ID
+- Users can join via shareable links
+- Supports different visibility modes (public / unlisted / private)
 
-Future improvements
-Add persistence using a database
-Improve presence and cursor handling
-Better UI/UX for collaboration
-Add user authentication
-Extend AI features beyond summarization
-Note
+### Presence and Awareness
+- Displays active users in a document session
+- Maintains user identity across a session
+- Cursor/presence system implemented (basic level)
 
-This project was built as a learning exercise to explore real-time collaboration and system design concepts.
+### Rich Text Editing
+- Built with TipTap (ProseMirror)
+- Supports formatting such as headings, lists, bold, italic, etc.
+
+### Document Management
+- Explore public rooms
+- View previously accessed documents (local history)
+- Access-controlled room entry
+
+### Export Options
+- Export document as PDF (via print flow)
+- Export document as HTML
+
+### AI Summarization
+- Generate summaries of document content
+- Supports multiple providers (Hugging Face, OpenAI, Gemini)
+- Designed as an assistive feature within the editor workflow
+
+### UI Features
+- Light/Dark mode with persistent theme
+- Responsive layout
+- Basic animations for smoother interaction
+
+---
+
+## Tech Stack
+
+### Frontend
+- React (Vite)
+- TipTap Editor (ProseMirror)
+- Yjs (y-websocket, y-indexeddb)
+- React Router
+
+### Backend
+- Node.js + Express
+- WebSocket server (ws)
+- MongoDB with Mongoose
+- Yjs persistence (y-mongodb-provider)
+
+### AI Integration
+- Hugging Face (via backend proxy)
+- OpenAI / Gemini (client-side integration)
+
+---
+
+## Architecture
+
+The system is divided into two main parts:
+
+### 1. Real-Time Collaboration Layer
+- Each room corresponds to a shared Y.Doc
+- Clients connect via WebSocket provider
+- Updates are propagated and merged using CRDT logic
+- Local persistence is handled using IndexedDB for resilience
+
+### 2. Backend Layer
+- Handles room creation, deletion, and access control
+- Stores room metadata in MongoDB
+- Persists Yjs document updates using MongoDB provider
+- Provides API endpoint for summarization (Hugging Face)
+
+---
+
+## How Synchronization Works
+
+When a user joins a room:
+1. A shared Yjs document is initialized or loaded
+2. The client connects to the WebSocket server
+3. Changes made in the editor are converted into Yjs updates
+4. Updates are broadcast to all connected clients
+5. CRDT ensures that all changes are merged consistently without conflicts
+
+This approach avoids issues like overwriting content or race conditions that occur in naive real-time implementations.
+
+---
+
+## Running Locally
+
+### Start backend
+```bash
+node server.js
