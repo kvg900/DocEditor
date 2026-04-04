@@ -1,23 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Lock, Globe, Link, ArrowLeft, PlusCircle } from 'lucide-react';
+import { Link2, Globe, ArrowLeft, PlusCircle } from 'lucide-react';
 import { API_BASE, safeJson } from '../utils/network';
 import './CreateRoomPage.css';
 
 const CreateRoomPage = ({ clientId }) => {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState('');
-  const [visibility, setVisibility] = useState('private');
+  const [visibility, setVisibility] = useState('unlisted');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [username, setUsername] = useState(() => localStorage.getItem('username') || '');
 
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!roomName.trim()) {
-      setError('Please enter a notebook name');
+      setError('Please enter a room name');
       return;
     }
+    if (!username.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+
+    // Save username to localStorage
+    localStorage.setItem('username', username.trim());
 
     setCreating(true);
     setError('');
@@ -26,21 +34,20 @@ const CreateRoomPage = ({ clientId }) => {
       const res = await fetch(`${API_BASE}/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          roomName: roomName.trim(), 
-          clientId, 
-          visibility 
+        body: JSON.stringify({
+          roomName: roomName.trim(),
+          clientId,
+          visibility,
         }),
       });
       const data = await safeJson(res);
 
       if (!res.ok) {
-        setError(data?.error || 'Failed to create notebook');
+        setError(data?.error || 'Failed to create room');
         setCreating(false);
         return;
       }
 
-      // Navigate to the new room
       navigate(`/doc/${data.roomId}`);
     } catch {
       setError('Could not reach server. Please try again.');
@@ -48,82 +55,115 @@ const CreateRoomPage = ({ clientId }) => {
     }
   };
 
-  const getVisibilityHelper = () => {
-    if (visibility === 'private') return 'Only you can see and join this notebook.';
-    if (visibility === 'unlisted') return 'Anyone with the link can join.';
-    if (visibility === 'public') return 'Visible to everyone in the community.';
-    return '';
-  };
+  const visibilityOptions = [
+    {
+      id: 'unlisted',
+      icon: Link2,
+      label: 'Link Only',
+      desc: 'Anyone with the link can join',
+    },
+    {
+      id: 'public',
+      icon: Globe,
+      label: 'Public',
+      desc: 'Visible to everyone',
+    },
+  ];
 
   return (
-    <div className="create-room-container">
+    <div className="create-page">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="create-room-card glass-card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="create-card"
       >
-        <div className="create-room-header">
-          <h1 className="create-room-title">New Notebook</h1>
-          <p className="create-room-subtitle">Create a collaborative space for your thoughts.</p>
+        <div className="create-header">
+          <h1 className="create-title">Create a Room</h1>
+          <p className="create-subtitle">
+            Set up a collaborative space in seconds.
+          </p>
         </div>
 
-        <form onSubmit={handleCreate} className="create-room-form">
-          <div className="form-group mb-6">
-            <label className="form-label" htmlFor="room-name">Notebook Name</label>
+        <form onSubmit={handleCreate} className="create-form">
+          {/* Username field */}
+          <div className="field-group">
+            <label className="field-label" htmlFor="create-username">
+              Your Name
+            </label>
             <input
-              id="room-name"
+              id="create-username"
               type="text"
-              className="form-input"
-              placeholder="e.g. Project Specs, Daily Journal"
+              className="field-input"
+              placeholder="e.g. Alice"
+              value={username}
+              onChange={(e) => { setUsername(e.target.value); setError(''); }}
+            />
+          </div>
+
+          {/* Room name field */}
+          <div className="field-group">
+            <label className="field-label" htmlFor="create-room-name">
+              Room Name
+            </label>
+            <input
+              id="create-room-name"
+              type="text"
+              className="field-input"
+              placeholder="e.g. Project Brainstorm"
               value={roomName}
               onChange={(e) => { setRoomName(e.target.value); setError(''); }}
               autoFocus
             />
           </div>
 
-          <div className="form-group mb-8">
-            <label className="form-label">Privacy</label>
-            <div className="visibility-grid">
-              {[
-                { id: 'private', icon: Lock, label: 'Private' },
-                { id: 'unlisted', icon: Link, label: 'Unlisted' },
-                { id: 'public', icon: Globe, label: 'Public' },
-              ].map((item) => (
-                <label key={item.id} className="visibility-item">
+          {/* Visibility picker */}
+          <div className="field-group">
+            <label className="field-label">Room Type</label>
+            <div className="visibility-options">
+              {visibilityOptions.map((opt) => (
+                <label key={opt.id} className="vis-option" htmlFor={`vis-${opt.id}`}>
                   <input
                     type="radio"
                     name="visibility"
-                    value={item.id}
-                    checked={visibility === item.id}
+                    id={`vis-${opt.id}`}
+                    value={opt.id}
+                    checked={visibility === opt.id}
                     onChange={(e) => setVisibility(e.target.value)}
                   />
-                  <div className="visibility-box">
-                    <item.icon className="visibility-icon" />
-                    <span className="visibility-name">{item.label}</span>
+                  <div className="vis-card">
+                    <opt.icon className="vis-icon" />
+                    <div className="vis-text">
+                      <span className="vis-label">{opt.label}</span>
+                      <span className="vis-desc">{opt.desc}</span>
+                    </div>
                   </div>
                 </label>
               ))}
             </div>
-            <p className="visibility-helper">{getVisibilityHelper()}</p>
           </div>
 
-          {error && <p className="error-message" style={{ color: '#ff6b6b', fontSize: '0.875rem', marginBottom: '1rem', textAlign: 'center' }}>{error}</p>}
+          {error && <p className="form-error">{error}</p>}
 
-          <button type="submit" className="create-btn" disabled={creating || !roomName.trim()}>
+          <button
+            type="submit"
+            className="create-submit-btn"
+            disabled={creating || !roomName.trim() || !username.trim()}
+            id="create-room-submit"
+          >
             {creating ? (
-              <span className="loader" />
+              <div className="spinner" style={{ width: '1.25rem', height: '1.25rem', borderWidth: '2px' }} />
             ) : (
               <>
-                <PlusCircle className="w-5 h-5" />
-                Create Notebook
+                <PlusCircle className="btn-icon" />
+                Create Room
               </>
             )}
           </button>
         </form>
 
-        <button onClick={() => navigate(-1)} className="back-link">
-          <ArrowLeft className="w-4 h-4" />
+        <button onClick={() => navigate(-1)} className="back-link" id="create-back-btn">
+          <ArrowLeft className="back-icon" />
           Go Back
         </button>
       </motion.div>
