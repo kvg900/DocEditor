@@ -1,8 +1,39 @@
 /* ============================================================
-   Global Styles — Inter font, dark theme, base resets
+   InkSynk Design System — Modern, Minimalist, Premium
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* Colors - Modern HSL Palette */
+  --bg-primary: 240 10% 3.9%;
+  --bg-secondary: 240 10% 10%;
+  --fg-primary: 0 0% 98%;
+  --fg-secondary: 240 5% 64.9%;
+  --accent: 263.4 70% 50.4%; /* Premium Purple */
+  --accent-foreground: 210 40% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 263.4 70% 50.4%;
+  
+  --radius: 0.75rem;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+}
+
+[data-theme='light'] {
+  --bg-primary: 0 0% 100%;
+  --bg-secondary: 240 4.8% 95.9%;
+  --fg-primary: 240 10% 3.9%;
+  --fg-secondary: 240 3.8% 46.1%;
+  --accent: 263.4 70% 50.4%;
+  --accent-foreground: 210 40% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
 
 * {
   margin: 0;
@@ -13,12 +44,106 @@
 html, body, #root {
   height: 100%;
   width: 100%;
+  background-color: hsl(var(--bg-primary));
+  color: hsl(var(--fg-primary));
+  overflow-x: hidden;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 40%, #24243e 100%);
-  color: #e0e0e0;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Animated Background Loop */
+.bg-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  background: hsl(var(--bg-primary));
+}
+
+.blob {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.2) 0%, transparent 100%);
+  filter: blur(80px);
+  border-radius: 50%;
+  animation: move 20s infinite alternate;
+}
+
+.blob-1 {
+  top: -100px;
+  right: -100px;
+  animation-duration: 25s;
+}
+
+.blob-2 {
+  bottom: -150px;
+  left: -100px;
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.15) 0%, transparent 100%);
+  animation-duration: 30s;
+  animation-delay: -5s;
+}
+
+@keyframes move {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(100px, 100px) scale(1.1); }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Typography Utilities */
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--fg-primary)) 0%, hsl(var(--fg-primary) / 0.7) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Global Transition & Button Polish */
+button, a {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.primary-btn {
+  box-shadow: 0 0 15px hsl(var(--accent) / 0.2);
+}
+
+.primary-btn:hover {
+  box-shadow: 0 0 25px hsl(var(--accent) / 0.4);
+  transform: translateY(-1px);
+}
+
+
+

@@ -1,0 +1,171 @@
+.editor-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6rem 2rem 2rem; /* Account for fixed navbar and floating toolbar */
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.editor-card {
+  width: 100%;
+  max-width: 1000px;
+  background: hsl(var(--bg-primary));
+  min-height: 80vh;
+  padding: 4rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.editor-card:focus-within {
+  border-color: hsl(var(--accent) / 0.3);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* TipTap ProseMirror adjustments */
+.tiptap {
+  outline: none;
+  min-height: 70vh;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: hsl(var(--fg-primary));
+}
+
+.tiptap p {
+  margin-bottom: 1rem;
+}
+
+.tiptap h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.tiptap h2 {
+  font-size: 1.875rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* Connection Overlay */
+.connection-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: hsl(var(--bg-primary));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  gap: 2rem;
+}
+
+.connection-text {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: hsl(var(--fg-secondary));
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Modern Status Bar */
+.editor-status-bar {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  z-index: 50;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.connected { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
+.status-dot.connecting { background-color: #f59e0b; animation: blink 1s infinite; }
+.status-dot.disconnected { background-color: #ef4444; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.users-list {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.user-badge {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid hsl(var(--bg-primary));
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: -0.5rem;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.user-badge:hover {
+  transform: translateY(-4px) scale(1.1);
+  z-index: 10;
+}
+
+/* Collaboration Cursors */
+.collaboration-cursor__caret {
+  position: relative;
+  border-left: 2px solid;
+  border-right: 2px solid;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  word-break: normal;
+}
+
+.collaboration-cursor__label {
+  position: absolute;
+  top: -1.4em;
+  left: -2px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  user-select: none;
+  color: #fff;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px 3px 3px 0;
+  white-space: nowrap;
+}

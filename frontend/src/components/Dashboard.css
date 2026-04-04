@@ -1,0 +1,156 @@
+.dashboard-container {
+  min-height: 100vh;
+  padding: 4rem 2rem;
+  position: relative;
+  z-index: 10;
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+}
+
+.dashboard-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notebook-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.notebook-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.notebook-card:hover {
+  transform: translateY(-4px);
+  border-color: hsl(var(--accent) / 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notebook-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: hsl(var(--accent));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.notebook-card:hover::before {
+  opacity: 1;
+}
+
+.notebook-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notebook-icon-wrapper {
+  background: var(--glass-bg);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.notebook-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.notebook-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: hsl(var(--fg-secondary));
+  margin-top: auto;
+}
+
+.notebook-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notebook-action-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: hsl(var(--fg-secondary));
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notebook-action-btn:hover {
+  background: hsl(var(--fg-primary) / 0.1);
+  color: hsl(var(--fg-primary));
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.empty-dashboard {
+  text-align: center;
+  padding: 8rem 0;
+}
+
+.empty-icon {
+  width: 4rem;
+  height: 4rem;
+  color: hsl(var(--fg-secondary) / 0.5);
+  margin-bottom: 1.5rem;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.empty-subtitle {
+  color: hsl(var(--fg-secondary));
+  margin-bottom: 2rem;
+}
+
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+@media (max-width: 640px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}

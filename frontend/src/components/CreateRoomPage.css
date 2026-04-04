@@ -1,0 +1,178 @@
+.create-room-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.create-room-card {
+  width: 100%;
+  max-width: 28rem;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.create-room-header {
+  text-align: center;
+}
+
+.create-room-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+.create-room-subtitle {
+  color: hsl(var(--fg-secondary));
+  font-size: 0.875rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--fg-secondary));
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  color: hsl(var(--fg-primary));
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: hsl(var(--accent));
+  box-shadow: 0 0 0 2px hsl(var(--accent) / 0.2);
+}
+
+.visibility-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.visibility-item {
+  position: relative;
+  cursor: pointer;
+}
+
+.visibility-item input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.visibility-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.visibility-item:hover .visibility-box {
+  border-color: var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.visibility-item input:checked + .visibility-box {
+  background: hsl(var(--accent) / 0.1);
+  border-color: hsl(var(--accent));
+}
+
+.visibility-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: hsl(var(--fg-secondary));
+}
+
+.visibility-item input:checked + .visibility-box .visibility-icon {
+  color: hsl(var(--accent));
+}
+
+.visibility-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.visibility-helper {
+  font-size: 0.75rem;
+  color: hsl(var(--fg-secondary));
+  margin-top: 0.5rem;
+  text-align: center;
+  min-height: 1.5rem;
+}
+
+.create-btn {
+  width: 100%;
+  padding: 1rem;
+  background-color: hsl(var(--accent));
+  color: white;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.create-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.create-btn:active {
+  transform: translateY(0);
+}
+
+.create-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: hsl(var(--fg-secondary));
+  text-decoration: none;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.back-link:hover {
+  color: hsl(var(--fg-primary));
+}
