@@ -1,6 +1,6 @@
 # InkSynk – Real-Time Collaborative Editor
 
-Live Demo: https://your-app-link.vercel.app
+Live Demo: https://collaborative-editor-g1t5.vercel.app/
 
 InkSynk is a full-stack real-time collaborative writing platform designed to explore how shared state systems work in multi-user environments. It allows multiple users to edit the same document simultaneously while maintaining consistency across all clients using CRDTs (Conflict-free Replicated Data Types).
 
