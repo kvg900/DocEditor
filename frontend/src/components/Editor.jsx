@@ -12,7 +12,7 @@
  * [ADDED] Custom user name via prompt + localStorage
  */
 
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -22,6 +22,7 @@ import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { IndexeddbPersistence } from 'y-indexeddb';  // [ADDED] local persistence
 import Toolbar from './Toolbar';
+import { API_BASE, getWsUrl } from '../utils/network';
 
 // ---- Random User Identity ----
 
@@ -61,13 +62,14 @@ const getUserName = () => {
 const Editor = ({ roomName }) => {
   // Track connected users from the awareness protocol
   const [users, setUsers] = useState([]);
+  const [connectionState, setConnectionState] = useState('connecting');
 
   /**
    * useMemo ensures the Yjs document and WebSocket provider
    * are created only once per component lifecycle.
    *
    * - Y.Doc: The shared CRDT document that handles merge conflicts
-   * - WebsocketProvider: Connects to the y-websocket server at ws://localhost:1234
+   * - WebsocketProvider: Connects to the production y-websocket server
    *   and syncs the Y.Doc across all connected clients
    * - [CHANGED] Room name now comes from the roomName prop (URL-based)
    * - [ADDED] IndexeddbPersistence for local offline persistence
@@ -79,9 +81,10 @@ const Editor = ({ roomName }) => {
   const { ydoc, provider, indexeddbProvider } = useMemo(() => {
     const ydoc = new Y.Doc();
 
-    // [CHANGED] Use dynamic roomName from URL instead of hardcoded string
+    const wsUrl = getWsUrl(API_BASE);
+
     const provider = new WebsocketProvider(
-      import.meta.env.DEV ? 'ws://localhost:1234' : 'wss://collaborative-editor-9djr.onrender.com', // y-websocket server URL
+      wsUrl,
       roomName,                       // [CHANGED] Dynamic room name from URL
       ydoc
     );
@@ -98,6 +101,9 @@ const Editor = ({ roomName }) => {
    */
   useEffect(() => {
     const awareness = provider.awareness;
+    const handleStatus = ({ status }) => {
+      setConnectionState(status);
+    };
 
     // Explicitly set this tab's unique identity on the awareness protocol
     // This ensures each tab broadcasts its own distinct name + color
@@ -114,6 +120,7 @@ const Editor = ({ roomName }) => {
 
     // Listen for changes in the awareness protocol
     awareness.on('change', updateUsers);
+    provider.on('status', handleStatus);
 
     // Initial read
     updateUsers();
@@ -121,6 +128,7 @@ const Editor = ({ roomName }) => {
     // Cleanup: disconnect provider & destroy doc on unmount
     return () => {
       awareness.off('change', updateUsers);
+      provider.off('status', handleStatus);
       provider.disconnect();
       indexeddbProvider.destroy();  // [ADDED] clean up IndexedDB provider
       ydoc.destroy();
@@ -164,6 +172,13 @@ const Editor = ({ roomName }) => {
     <div className="editor-container">
       {/* Formatting toolbar */}
       <Toolbar editor={editor} />
+
+      {connectionState !== 'connected' && (
+        <div className="join-error" role="status">
+          WebSocket {connectionState === 'connecting' ? 'connecting' : 'disconnected'}.
+          Changes will sync when the connection returns.
+        </div>
+      )}
 
       {/* The actual editable area rendered by TipTap */}
       <EditorContent editor={editor} />

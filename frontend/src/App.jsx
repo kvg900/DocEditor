@@ -12,10 +12,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Editor from './components/Editor';
+import { API_BASE, safeJson } from './utils/network';
 import './App.css';
-
-// ---- API Base URL ----
-const API_BASE = import.meta.env.DEV ? 'http://localhost:1234' : '';
 
 // ---- URL-Based Room Routing ----
 
@@ -59,15 +57,41 @@ const getRoomFromUrl = () => {
 function RecentRooms({ onSelectRoom }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`${API_BASE}/rooms`)
-      .then((res) => res.json())
-      .then((data) => {
-        setRooms(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    let cancelled = false;
+
+    const loadRooms = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/rooms`);
+        const data = await safeJson(res);
+
+        if (!res.ok) {
+          throw new Error((data && data.error) || 'Failed to load rooms');
+        }
+
+        if (!cancelled) {
+          setRooms(Array.isArray(data) ? data : []);
+          setError('');
+        }
+      } catch {
+        if (!cancelled) {
+          setError('Could not load recent rooms');
+          setRooms([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadRooms();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (loading) {
@@ -75,6 +99,15 @@ function RecentRooms({ onSelectRoom }) {
       <div className="recent-rooms">
         <h3 className="recent-rooms-title">Recent Rooms</h3>
         <p className="recent-rooms-loading">Loading…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="recent-rooms">
+        <h3 className="recent-rooms-title">Recent Rooms</h3>
+        <p className="join-error">{error}</p>
       </div>
     );
   }
@@ -142,10 +175,10 @@ function JoinScreen({ onJoin }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomName: trimmedName }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
 
       if (!res.ok) {
-        setError(data.error || 'Failed to create room');
+        setError((data && data.error) || 'Failed to create room');
         setCreating(false);
         return;
       }
