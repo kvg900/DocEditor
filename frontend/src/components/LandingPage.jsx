@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Users, Zap, Sparkles } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -43,15 +43,7 @@ const LandingPage = () => {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="hero-content"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="hero-badge"
-          >
-            <Sparkles size={14} className="badge-sparkle" />
-            <span>Redesigned for Focus</span>
-          </motion.div>
+
 
           <h1 className="hero-title">
             Write Together.
