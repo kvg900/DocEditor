@@ -8,6 +8,7 @@ import CreateRoomPage from './components/CreateRoomPage';
 import ExplorePage from './components/ExplorePage';
 import HistoryPage from './components/HistoryPage';
 import { API_BASE, safeJson } from './utils/network';
+import { Analytics } from '@vercel/analytics/react';
 
 import './App.css';
 
@@ -181,6 +182,7 @@ function App() {
           <Route path="/doc/:roomId" element={<RoomGuard clientId={clientId} />} />
         </Routes>
       </main>
+      <Analytics />
     </div>
   );
 }
