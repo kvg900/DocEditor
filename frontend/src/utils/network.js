@@ -1,13 +1,13 @@
-const rawApiBase = import.meta.env.VITE_API_URL;
+const rawApiBase = "http://localhost:1234";
 
 if (!rawApiBase) {
-  throw new Error('Missing required VITE_API_URL environment variable.');
+  throw new Error("Missing required VITE_API_URL environment variable.");
 }
 
 export const API_BASE = rawApiBase;
 
 export const getWsUrl = (apiBase, roomId, clientId) => {
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
   const urlParams = new URL(apiBase);
   const wsUrl = `${wsProtocol}://${urlParams.host}?roomId=${roomId}&clientId=${clientId}`;
   console.log("FINAL WS URL:", wsUrl);
