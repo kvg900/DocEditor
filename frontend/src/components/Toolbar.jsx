@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Bold,
   Italic,
@@ -14,9 +14,9 @@ import {
   FileText,
   FileCode,
   Sparkles,
-} from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
-import './Toolbar.css';
+} from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import "./Toolbar.css";
 
 const Toolbar = ({ editor, roomName, onToggleAI }) => {
   const navigate = useNavigate();
@@ -36,9 +36,9 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
     const html = `<div class="tiptap">${editor.getHTML()}</div>`;
     // Basic wrapper to include styling locally if opened in browser
     const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${roomName}</title><style>body{font-family:sans-serif;max-width:800px;margin:2rem auto;padding:1rem;} .tiptap h1{font-size:2rem} .tiptap p{line-height:1.6} .tiptap pre{background:#f3f4f6;padding:1rem;border-radius:4px;}</style></head><body>${html}</body></html>`;
-    const blob = new Blob([fullHtml], { type: 'text/html' });
+    const blob = new Blob([fullHtml], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `notebook-${roomName}.html`;
     a.click();
@@ -60,7 +60,7 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
           <div className="toolbar-logo">
             <Zap className="toolbar-logo-icon" />
           </div>
-          <span className="toolbar-brand-name">InkSynk</span>
+          <span className="toolbar-brand-name">DocFlow</span>
         </Link>
 
         <div className="toolbar-sep" />
@@ -87,7 +87,7 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
       <div className="toolbar-center" id="toolbar-formatting">
         <div className="toolbar-group">
           <button
-            className={`tb ${editor.isActive('bold') ? 'active' : ''}`}
+            className={`tb ${editor.isActive("bold") ? "active" : ""}`}
             onClick={() => editor.chain().focus().toggleBold().run()}
             title="Bold"
             id="tb-bold"
@@ -96,7 +96,7 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
           </button>
 
           <button
-            className={`tb ${editor.isActive('italic') ? 'active' : ''}`}
+            className={`tb ${editor.isActive("italic") ? "active" : ""}`}
             onClick={() => editor.chain().focus().toggleItalic().run()}
             title="Italic"
             id="tb-italic"
@@ -105,7 +105,7 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
           </button>
 
           <button
-            className={`tb ${editor.isActive('underline') ? 'active' : ''}`}
+            className={`tb ${editor.isActive("underline") ? "active" : ""}`}
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             title="Underline"
             id="tb-underline"
@@ -118,8 +118,10 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
 
         <div className="toolbar-group">
           <button
-            className={`tb ${editor.isActive('heading', { level: 1 }) ? 'active' : ''}`}
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+            className={`tb ${editor.isActive("heading", { level: 1 }) ? "active" : ""}`}
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 1 }).run()
+            }
             title="Heading 1"
             id="tb-h1"
           >
@@ -127,8 +129,10 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
           </button>
 
           <button
-            className={`tb ${editor.isActive('heading', { level: 2 }) ? 'active' : ''}`}
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            className={`tb ${editor.isActive("heading", { level: 2 }) ? "active" : ""}`}
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
             title="Heading 2"
             id="tb-h2"
           >
@@ -136,7 +140,7 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
           </button>
 
           <button
-            className={`tb ${editor.isActive('bulletList') ? 'active' : ''}`}
+            className={`tb ${editor.isActive("bulletList") ? "active" : ""}`}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             title="Bullet List"
             id="tb-list"
@@ -154,7 +158,7 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
             onClick={onToggleAI}
             title="AI Summarizer"
             id="tb-ai"
-            style={{ color: 'hsl(var(--accent))' }}
+            style={{ color: "hsl(var(--accent))" }}
           >
             <Sparkles className="tb-icon" />
           </button>
@@ -171,14 +175,20 @@ const Toolbar = ({ editor, roomName, onToggleAI }) => {
           >
             <Download className="tb-icon" />
           </button>
-          
+
           {showDownloadMenu && (
             <div className="toolbar-dropdown">
-              <button className="toolbar-dropdown-item" onClick={handleDownloadPDF}>
+              <button
+                className="toolbar-dropdown-item"
+                onClick={handleDownloadPDF}
+              >
                 <FileText className="dropdown-icon" />
                 Save as PDF
               </button>
-              <button className="toolbar-dropdown-item" onClick={handleDownloadHTML}>
+              <button
+                className="toolbar-dropdown-item"
+                onClick={handleDownloadHTML}
+              >
                 <FileCode className="dropdown-icon" />
                 Export HTML
               </button>

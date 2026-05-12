@@ -1,31 +1,31 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
-import { nanoid } from 'nanoid';
-import { Sun, Moon, Zap, User } from 'lucide-react';
-import Editor from './components/Editor';
-import LandingPage from './components/LandingPage';
-import CreateRoomPage from './components/CreateRoomPage';
-import ExplorePage from './components/ExplorePage';
-import HistoryPage from './components/HistoryPage';
-import { API_BASE, safeJson } from './utils/network';
-import { Analytics } from '@vercel/analytics/react';
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { Routes, Route, useNavigate, useParams, Link } from "react-router-dom";
+import { nanoid } from "nanoid";
+import { Sun, Moon, Zap, User } from "lucide-react";
+import Editor from "./components/Editor";
+import LandingPage from "./components/LandingPage";
+import CreateRoomPage from "./components/CreateRoomPage";
+import ExplorePage from "./components/ExplorePage";
+import HistoryPage from "./components/HistoryPage";
+import { API_BASE, safeJson } from "./utils/network";
+import { Analytics } from "@vercel/analytics/react";
 
-import './App.css';
+import "./App.css";
 
 // ---- Theme Manager ----
 
 function useTheme() {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('inksynk-theme') || 'light';
+    return localStorage.getItem("inksynk-theme") || "light";
   });
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('inksynk-theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("inksynk-theme", theme);
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
   return { theme, toggleTheme };
@@ -34,7 +34,7 @@ function useTheme() {
 // ---- Components ----
 
 function Navbar({ theme, toggleTheme }) {
-  const username = localStorage.getItem('username');
+  const username = localStorage.getItem("username");
 
   return (
     <nav className="navbar">
@@ -43,12 +43,16 @@ function Navbar({ theme, toggleTheme }) {
           <div className="brand-logo">
             <Zap className="brand-icon" />
           </div>
-          <span className="brand-name">InkSynk</span>
+          <span className="brand-name">DocFlow</span>
         </Link>
 
         <div className="navbar-actions">
-          <Link to="/explore" className="navbar-link">Explore</Link>
-          <Link to="/history" className="navbar-link">My Notebooks</Link>
+          <Link to="/explore" className="navbar-link">
+            Explore
+          </Link>
+          <Link to="/history" className="navbar-link">
+            My Notebooks
+          </Link>
 
           {username && (
             <div className="navbar-user" id="navbar-user-display">
@@ -61,9 +65,9 @@ function Navbar({ theme, toggleTheme }) {
             onClick={toggleTheme}
             className="theme-toggle"
             id="theme-toggle-btn"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
           >
-            {theme === 'light' ? (
+            {theme === "light" ? (
               <Moon className="toggle-icon" />
             ) : (
               <Sun className="toggle-icon" />
@@ -78,10 +82,10 @@ function Navbar({ theme, toggleTheme }) {
 // ---- Client Identity ----
 
 const getClientId = () => {
-  let id = localStorage.getItem('collab-editor-client-id');
+  let id = localStorage.getItem("collab-editor-client-id");
   if (!id) {
     id = nanoid();
-    localStorage.setItem('collab-editor-client-id', id);
+    localStorage.setItem("collab-editor-client-id", id);
   }
   return id;
 };
@@ -91,14 +95,20 @@ const getClientId = () => {
 function RoomGuard({ clientId }) {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const [access, setAccess] = useState({ loading: true, allowed: false, reason: null });
+  const [access, setAccess] = useState({
+    loading: true,
+    allowed: false,
+    reason: null,
+  });
 
   useEffect(() => {
     let cancelled = false;
 
     const checkAccess = async () => {
       try {
-        const res = await fetch(`${API_BASE}/rooms/${roomId}/access?clientId=${clientId}`);
+        const res = await fetch(
+          `${API_BASE}/rooms/${roomId}/access?clientId=${clientId}`,
+        );
         const data = await safeJson(res);
 
         if (!cancelled) {
@@ -108,19 +118,25 @@ function RoomGuard({ clientId }) {
             setAccess({
               loading: false,
               allowed: false,
-              reason: data.reason || 'error',
+              reason: data.reason || "error",
             });
           }
         }
       } catch {
         if (!cancelled) {
-          setAccess({ loading: false, allowed: false, reason: 'network_error' });
+          setAccess({
+            loading: false,
+            allowed: false,
+            reason: "network_error",
+          });
         }
       }
     };
 
     checkAccess();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [roomId, clientId]);
 
   if (access.loading) {
@@ -139,18 +155,22 @@ function RoomGuard({ clientId }) {
       <div className="guard-screen">
         <div className="guard-card guard-error">
           <div className="guard-icon">
-            {access.reason === 'private' ? '🔒' : '🚫'}
+            {access.reason === "private" ? "🔒" : "🚫"}
           </div>
           <h2 className="guard-title">Access Denied</h2>
           <p className="guard-message">
-            {access.reason === 'private' && 'This is a private notebook. Only the owner can enter.'}
-            {access.reason === 'not_found' && 'This notebook does not exist or has been deleted.'}
-            {access.reason === 'network_error' && 'Could not reach the server. Please check your connection.'}
-            {access.reason === 'error' && 'An unexpected error occurred while checking access.'}
+            {access.reason === "private" &&
+              "This is a private notebook. Only the owner can enter."}
+            {access.reason === "not_found" &&
+              "This notebook does not exist or has been deleted."}
+            {access.reason === "network_error" &&
+              "Could not reach the server. Please check your connection."}
+            {access.reason === "error" &&
+              "An unexpected error occurred while checking access."}
           </p>
           <button
             className="primary-btn"
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             id="guard-return-btn"
           >
             Return Home
@@ -178,8 +198,14 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/history" element={<HistoryPage />} />
-          <Route path="/create" element={<CreateRoomPage clientId={clientId} />} />
-          <Route path="/doc/:roomId" element={<RoomGuard clientId={clientId} />} />
+          <Route
+            path="/create"
+            element={<CreateRoomPage clientId={clientId} />}
+          />
+          <Route
+            path="/doc/:roomId"
+            element={<RoomGuard clientId={clientId} />}
+          />
         </Routes>
       </main>
       <Analytics />
