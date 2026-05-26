@@ -1,110 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Copy, Settings, Check, AlertCircle } from 'lucide-react';
-import { API_BASE } from '../utils/network';
-import './AISummarizer.css';
-
-// Provider configurations
-const PROVIDERS = {
-  huggingface: { name: 'Hugging Face (BART)', keyStore: 'inksynk-hf-key' },
-  openai: { name: 'OpenAI (GPT-4o-mini)', keyStore: 'inksynk-openai-key' },
-  gemini: { name: 'Google Gemini (Flash)', keyStore: 'inksynk-gemini-key' },
-};
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Sparkles, Copy, Check, AlertCircle } from "lucide-react";
+import "./AISummarizer.css";
+import { generateSummary } from "../../../AISummarizerExperimental.js";
 
 const AISummarizer = ({ isOpen, onClose, editor }) => {
-  const [provider, setProvider] = useState('huggingface');
-  const [apiKey, setApiKey] = useState('');
-  const [summary, setSummary] = useState('');
+  const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showSettings, setShowSettings] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  // Load API key when provider changes
-  useEffect(() => {
-    const savedKey = localStorage.getItem(PROVIDERS[provider].keyStore);
-    if (savedKey) {
-      setApiKey(savedKey);
-      setShowSettings(false);
-    } else {
-      setApiKey('');
-      setShowSettings(true);
-    }
-  }, [provider]);
-
-  // Save API key
-  const saveKey = (val) => {
-    setApiKey(val);
-    if (val.trim()) {
-      localStorage.setItem(PROVIDERS[provider].keyStore, val.trim());
-    } else {
-      localStorage.removeItem(PROVIDERS[provider].keyStore);
-    }
-  };
-
-  const generateSummary = async () => {
-    if (!editor) return;
-    const text = editor.getText();
-    if (!text || text.trim().length < 50) {
-      setError('Not enough text to summarize. Please write something first!');
+  const handleGenerateSummary = async () => {
+    if (!editor) {
+      setError("Editor not available");
       return;
     }
-    if (!apiKey) {
-      setError('Please enter your API key first.');
-      setShowSettings(true);
+
+    const text = editor.getText();
+
+    if (!text || text.trim().length < 50) {
+      setError(
+        "Not enough text to summarize. Please write at least 50 characters.",
+      );
       return;
     }
 
     setLoading(true);
     setError(null);
-    setSummary('');
+    setSummary("");
 
     try {
-      if (provider === 'huggingface') {
-        const res = await fetch(`${API_BASE}/api/summarize`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ 
-            text: text,
-            apiKey: apiKey 
-          })
-        });
-        const data = await res.json();
-        
-        if (data.error) throw new Error(data.error);
-        
-        setSummary(data[0]?.summary_text || data.summary_text || 'Unable to generate summary.');
-      }
-      else if (provider === 'openai') {
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [{ role: 'system', content: 'Summarize the following text concisely.' }, { role: 'user', content: text }]
-          })
-        });
-        if (!res.ok) throw new Error('OpenAI API error. Check your API key.');
-        const data = await res.json();
-        setSummary(data.choices[0]?.message?.content || 'Unable to generate summary.');
-      }
-      else if (provider === 'gemini') {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: `Summarize the following text concisely:\n\n${text}` }] }] })
-        });
-        if (!res.ok) throw new Error('Gemini API error. Check your API key.');
-        const data = await res.json();
-        setSummary(data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to generate summary.');
+      const { err, sum } = await generateSummary(text);
+
+      if (err) {
+        setError(err);
+      } else if (sum) {
+        setSummary(sum);
+      } else {
+        setError("No summary returned");
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during summarization.');
+      console.error(err);
+      setError("Something went wrong while generating summary.");
     } finally {
       setLoading(false);
     }
@@ -121,17 +58,20 @@ const AISummarizer = ({ isOpen, onClose, editor }) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div 
+          {/* Backdrop */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="ai-panel-backdrop"
             onClick={onClose}
           />
+
+          {/* Panel */}
           <motion.div
-            initial={{ x: '100%' }}
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="ai-panel"
           >
@@ -148,50 +88,6 @@ const AISummarizer = ({ isOpen, onClose, editor }) => {
             </div>
 
             <div className="ai-body">
-              <div className="ai-toolbar">
-                <button 
-                  className={`ai-settings-toggle ${showSettings ? 'active' : ''}`}
-                  onClick={() => setShowSettings(!showSettings)}
-                >
-                  <Settings size={14} />
-                  Configure AI
-                </button>
-              </div>
-
-              <AnimatePresence>
-                {showSettings && (
-                  <motion.div 
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="ai-settings-card"
-                  >
-                    <label className="ai-label">AI Provider</label>
-                    <select 
-                      value={provider} 
-                      onChange={(e) => setProvider(e.target.value)}
-                      className="ai-select"
-                    >
-                      {Object.entries(PROVIDERS).map(([key, config]) => (
-                        <option key={key} value={key}>{config.name}</option>
-                      ))}
-                    </select>
-
-                    <label className="ai-label">API Key (Stored Locally)</label>
-                    <input 
-                      type="password"
-                      placeholder={`Enter your ${PROVIDERS[provider].name} key`}
-                      value={apiKey}
-                      onChange={(e) => saveKey(e.target.value)}
-                      className="ai-input"
-                    />
-                    <p className="ai-help-text">
-                      Your key is securely stored in your browser's localStorage and only sent to the provider.
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               {error && (
                 <div className="ai-error">
                   <AlertCircle size={14} />
@@ -200,9 +96,9 @@ const AISummarizer = ({ isOpen, onClose, editor }) => {
               )}
 
               <div className="ai-action-area">
-                <button 
-                  className="ai-primary-btn" 
-                  onClick={generateSummary}
+                <button
+                  className="ai-primary-btn"
+                  onClick={handleGenerateSummary}
                   disabled={loading}
                 >
                   {loading ? (
@@ -223,17 +119,21 @@ const AISummarizer = ({ isOpen, onClose, editor }) => {
                 <div className="ai-result">
                   <div className="ai-result-header">
                     <h3>Summary</h3>
-                    <button 
-                      className="ai-copy-btn" 
+                    <button
+                      className="ai-copy-btn"
                       onClick={copyToClipboard}
                       title="Copy to clipboard"
                     >
-                      {copied ? <Check size={14} className="copied-icon" /> : <Copy size={14} />}
+                      {copied ? <Check size={14} /> : <Copy size={14} />}
                     </button>
                   </div>
-                  <div className="ai-result-content">
-                    {summary}
-                  </div>
+                  <div className="ai-result-content">{summary}</div>
+                </div>
+              )}
+
+              {!summary && !error && !loading && (
+                <div className="ai-placeholder">
+                  <p>Click "Generate Summary" to summarize your document</p>
                 </div>
               )}
             </div>

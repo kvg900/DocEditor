@@ -135,7 +135,7 @@ function RoomGuard({ clientId }) {
 
     checkAccess();
     return () => {
-      cancelled = true;
+      cancelled = true; // cleanup function
     };
   }, [roomId, clientId]);
 
